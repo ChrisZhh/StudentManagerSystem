@@ -1,7 +1,12 @@
 from student import Student
+import pandas as pd
 
 
 class StudentManager(object):
+    """
+    学生管理
+    """
+
     def __init__(self):
         self.student_list = []
 
@@ -37,10 +42,16 @@ class StudentManager(object):
 
     def load_student(self):
         """
-        从文件中加载学员
+        从文件中加载学员 利用pandas
         """
-        students = Student('aa', '男', 21)
-        self.student_list.append(students)
+        df = pd.read_excel('G:/Python/学员信息.xlsx', names=None)
+        data_from_excel = df.values.tolist()
+        for data in data_from_excel:
+            self.student_list.append(data)
+
+        # students = Student(153020198, '李渊大', 25)
+        # self.student_list.append(students.__str__())
+        # print(self.student_list)
 
     @staticmethod
     def show_main():
@@ -54,20 +65,44 @@ class StudentManager(object):
         print("6：退出系统")
 
     def student_add(self):
-        students = Student('bb', '女', 21)
+        num = input('请输入学员学号：')
+        name = input('请输入学生姓名：')
+        tel = input('请输入学生电话：')
+
+        students = Student(num, name, tel)
         self.student_list.append(students)
 
     def student_search(self):
+        name = input('请输入需要查看学生姓名：')
+
         for student in self.student_list:
-            print(student)
+            if student.name == name:
+                print(student)
 
     def student_delete(self):
+        name = input('请输入需要删除学生姓名：')
+
         for student in self.student_list:
-            if student.name == 'aa':
+            if student.name == name:
                 self.student_list.remove(student)
 
     def student_update(self):
+        name = input('请输入需要修改学生姓名：')
+
         for student in self.student_list:
-            if student.name == 'bb':
-                student.tel = 31
-                student.gender = '男'
+            if student.name == name:
+                new_name = input('请输入修改后的名字：')
+                new_num = input('请输入修改后的学号：')
+                new_tel = input('请输入修改后的电话：')
+
+                student.name = new_name
+                student.num = new_num
+                student.tel = new_tel
+
+    def student_show_all(self):
+        for student in self.student_list:
+            print(student)
+
+    def student_save(self):
+        df = pd.DataFrame(self.student_list)
+        print(df)

@@ -1,4 +1,5 @@
 from studentmanager import StudentManager
 
-studentsystem = StudentManager()
-studentsystem.show_main()
+if __name__ == '__main__':
+    student_system = StudentManager()
+    student_system.run()
