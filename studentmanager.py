@@ -83,6 +83,8 @@ class StudentManager(object):
                 print(student)
                 # 查到了之后跳出循环
                 break
+        else:
+            print("查无此人")
 
     def student_delete(self):
         name = input('请输入需要删除学生姓名：')
@@ -115,13 +117,21 @@ class StudentManager(object):
         显示所有学生
         """
         print('姓名\t学号\t年龄')
-        for student in self.student_list:
-            print(f'{student.name}\t{student.num}\t{student.age}')
+        for s in self.student_list:
+            print(f'{s.name}\t{s.num}\t{s.age}')
 
     def student_save(self):
-        data = []
+        """
+        保存数据到EXCEL
+        """
+        names = []
+        ages = []
+        nums = []
         for student_data in self.student_list:
-            data.append(student_data)
-        print(data)
-        df = pd.DataFrame(self.student_list)
-        print(df)
+            names.append(student_data.__dict__)
+            nums.append(student_data.num)
+            ages.append(student_data.age)
+        print(names)
+        # df = pd.DataFrame({"name": names, "num": nums, "age": ages})
+        # df.set_index("num", inplace=True)
+        # df.to_excel("G:/Python/学员信息.xlsx")
