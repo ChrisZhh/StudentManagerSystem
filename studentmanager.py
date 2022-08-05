@@ -12,7 +12,7 @@ class StudentManager(object):
 
     def run(self):
         # 1.加载学员
-        self.load_student()
+        self.load_student_file()
         while True:
             # 2.加载菜单
             self.show_main()
@@ -35,7 +35,7 @@ class StudentManager(object):
                 self.student_show_all()
             elif num == 6:
                 # 存
-                self.student_save()
+                self.student_save_file()
             elif num == 7:
                 # 退出
                 break
@@ -44,16 +44,18 @@ class StudentManager(object):
         """
         从文件中加载学员 利用pandas
         """
-        df = pd.read_excel('G:/Python/学员信息.xlsx', names=None)
-        data_from_excel = df.to_dict(orient='records')
-        for i in data_from_excel:
-            num = i['num']
-            name = i['name']
-            age = i['age']
-            student = Student(num, name, age)
-            self.student_list.append(student)
-        print(data_from_excel)
-        print(self.student_list)
+        # 如果该路径下存在Excel，则进行读取；如果不存在则进行创建
+        try:
+            df = pd.read_excel('G:/Python/学员信息.xlsx', names=None)
+            data_from_excel = df.to_dict(orient='records')
+            # 列表推导式=>创建一个新的列表，遍历data_from_excel并将Student实例化对象赋值给student_list
+            self.student_list = [Student(num=i['num'], name=i['name'], age=[i['age']]) for i in data_from_excel]
+            # print(data_from_excel)
+            # print(self.student_list)
+        except:
+            df = pd.DataFrame(columns=['name', 'num', 'age'])
+            df.set_index('num', inplace=True)
+            df.to_excel('G:/Python/学员信息.xlsx')
 
     @staticmethod
     def show_main():
@@ -122,16 +124,45 @@ class StudentManager(object):
 
     def student_save(self):
         """
-        保存数据到EXCEL
+        保存数据到EXCEL(with pandas)
         """
-        names = []
+        names = [i.name for i in self.student_list]
         ages = []
         nums = []
         for student_data in self.student_list:
-            names.append(student_data.__dict__)
             nums.append(student_data.num)
             ages.append(student_data.age)
-        print(names)
-        # df = pd.DataFrame({"name": names, "num": nums, "age": ages})
+        df = pd.DataFrame({"name": names, "num": nums, "age": ages})
+        print(df)
         # df.set_index("num", inplace=True)
         # df.to_excel("G:/Python/学员信息.xlsx")
+
+    def load_student_file(self):
+        try:
+            # 打开文件
+            f = open('student.data', 'r')
+        except:
+            # 该文件不存在，进行w模式的创建
+            # w:写入模式，如果不存在则进行创建，如果存在进行清空重写
+            f = open('student.data', 'w')
+        else:
+            # else语句，当执行try之后才执行else，执行except语句不会执行else
+            # 文件打开之后进行读取
+            data = f.read()
+            # 读取的data数据是str类型，使用eval函数转换成字典类型数据
+            new_list = eval(data)
+            # 列表推导式创建学生列表
+            self.student_list = [Student(i['num'], i['name'], i['age']) for i in new_list]
+        finally:
+            # 关闭文件
+            f.close()
+
+    def student_save_file(self):
+        # 打开文件
+        f = open('student.data', 'w')
+        # 遍历学生数据对象并获取字典数据
+        newfile = [i.__dict__ for i in self.student_list]
+        # 写入文件对象，write()参数类型为str类型
+        f.write(str(newfile))
+        # 关闭文件对象
+        f.close()
